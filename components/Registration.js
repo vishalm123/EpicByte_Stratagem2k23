@@ -46,19 +46,23 @@ function Registration() {
     <form onSubmit={handleSubmit}>
       <div>
         <label>Name:</label>
-        <input type="text" value={name} onChange={handleNameChange} required />
+        <input type="text" value={name} onChange={handleNameChange} name="name" required />
+      </div>
+      <div>
+        <label>password:</label>
+        <input type="password" value={name} onChange={handleNameChange} name="password" required />
       </div>
       <div>
         <label>Phone:</label>
-        <input type="tel" value={phone} onChange={handlePhoneChange} required />
+        <input type="tel" value={phone} onChange={handlePhoneChange} name="phone_num" required />
       </div>
       <div>
         <label>Address:</label>
-        <textarea value={address} onChange={handleAddressChange} required />
+        <textarea value={address} onChange={handleAddressChange} name="address" required />
       </div>
       <div>
         <label>Gender:</label>
-        <select value={gender} onChange={handleGenderChange} required>
+        <select value={gender} onChange={handleGenderChange} name="gender" required>
           <option value="">Select gender</option>
           <option value="male">Male</option>
           <option value="female">Female</option>
@@ -67,7 +71,7 @@ function Registration() {
       </div>
       <div>
         <label>Blood Group:</label>
-        <select type="text" value={bloodGroup} onChange={handleBloodGroupChange} required >
+        <select type="text" value={bloodGroup} onChange={handleBloodGroupChange} name="blood_group" required >
           <option value="A+ve">A+ve</option>
           <option value="A-ve">A-ve</option>
           <option value="B+ve">B+ve</option>
@@ -80,7 +84,7 @@ function Registration() {
       </div>
       <div>
         <label>Photo:</label>
-        <input type="file" accept="image/png,image/jpeg" onChange={handlePhotoChange} required />
+        <input type="file" accept="image/png,image/jpeg" onChange={handlePhotoChange} name="face" required />
         {photo && <img src={photo} alt="uploaded" />}
       </div>
       <div>
