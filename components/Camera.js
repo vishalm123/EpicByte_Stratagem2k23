@@ -1,54 +1,65 @@
-import React, { useState, useRef } from 'react';
+import React, { useRef, useState } from "react";
+import * as FileSaver from "file-saver";
 
-function Camera() {
-  const [cameraOn, setCameraOn] = useState(false);
+const Camera = () => {
+  const [stream, setStream] = useState(null);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
 
   const startCamera = () => {
-    navigator.mediaDevices.getUserMedia({ video: true })
+    navigator.mediaDevices
+      .getUserMedia({ video: true })
       .then((stream) => {
-        setCameraOn(true);
-        videoRef.current.srcObject = stream;
+        setStream(stream);
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
       })
-      .catch((error) => console.log(error));
+      .catch((err) => console.error(err));
   };
 
   const stopCamera = () => {
-    const stream = videoRef.current.srcObject;
-    if (!stream) return;
-
-    const tracks = stream.getTracks();
-    tracks.forEach((track) => track.stop());
-    setCameraOn(false);
+    if (stream) {
+      stream.getTracks().forEach((track) => track.stop());
+      setStream(null);
+    }
   };
 
-  const takePhoto = () => {
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    const context = canvas.getContext('2d');
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+  const capturePhoto = () => {
+    if (videoRef.current && canvasRef.current) {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      const context = canvas.getContext("2d");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      context.drawImage(video, 0, 0);
+      const dataURL = canvas.toDataURL();
+      const blob = dataURLtoBlob(dataURL);
+      FileSaver.saveAs(blob, "photo.png");
+    }
+  };
 
-    const dataURL = canvas.toDataURL();
-    console.log(dataURL);
+  const dataURLtoBlob = (dataURL) => {
+    const parts = dataURL.split(";base64,");
+    const contentType = parts[0].split(":")[1];
+    const raw = window.atob(parts[1]);
+    const rawLength = raw.length;
+    const uInt8Array = new Uint8Array(rawLength);
+    for (let i = 0; i < rawLength; ++i) {
+      uInt8Array[i] = raw.charCodeAt(i);
+    }
+    return new Blob([uInt8Array], { type: contentType });
   };
 
   return (
     <div>
-      <div>
-        <button onClick={startCamera}>Start Camera</button>
-        <button onClick={stopCamera}>Stop Camera</button>
-      </div>
-
-      {cameraOn && (
-        <div>
-          <video ref={videoRef} autoPlay />
-          <button onClick={takePhoto}>Take Photo</button>
-          <canvas ref={canvasRef} width={640} height={480} style={{ display: 'none' }} />
-        </div>
-      )}
+      <video ref={videoRef} autoPlay />
+      <button onClick={startCamera}>Start Camera</button>
+      <button onClick={stopCamera}>Stop Camera</button>
+      <button onClick={capturePhoto}>Capture Photo</button>
+      <canvas ref={canvasRef} style={{ display: "none" }} />
     </div>
   );
-}
+};
 
 export default Camera;
